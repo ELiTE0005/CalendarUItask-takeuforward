@@ -1,15 +1,15 @@
-import { useCallback, useState, useEffect, useRef } from "react";
-// Force HMR re-mount
+import { useState, useEffect, useRef, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { addMonths, subMonths, parseISO } from "date-fns";
+import { addMonths, subMonths } from "date-fns";
 import { ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
 import { useCalendar } from "@/hooks/useCalendar";
-import { useNotes } from "@/hooks/useNotes";
 import { SpiralBinding } from "./SpiralBinding";
 import { HeroImagePanel } from "./HeroImagePanel";
 import { CalendarGrid } from "./CalendarGrid";
 import { NotesPanel } from "./NotesPanel";
 import { MiniMonth } from "./MiniMonth";
+import { OrbitalClock } from "@/components/ui/orbital-clock";
+import { QuickNotes } from "./QuickNotes";
 
 export function WallCalendar() {
   const {
@@ -27,14 +27,7 @@ export function WallCalendar() {
     handlePointerCancel,
     handleKeyDown,
     getDayState,
-    rangeLabel,
-    setSelectedRange,
-    setPendingStart,
-    setCurrentMonth,
-    setDirection,
   } = useCalendar();
-
-  const { text, handleChange, pastNotes } = useNotes(selectedRange);
   const [isDark, setIsDark] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -60,17 +53,6 @@ export function WallCalendar() {
     document.documentElement.classList.toggle("dark", isDark);
   }, [isDark]);
 
-  const handleRestoreRange = useCallback(
-    (rangeKey: string) => {
-      const [startStr, endStr] = rangeKey.split("_");
-      const start = parseISO(startStr);
-      const end = parseISO(endStr);
-      setSelectedRange({ start, end });
-      setPendingStart(null);
-      setCurrentMonth(start);
-    },
-    [setSelectedRange, setPendingStart, setCurrentMonth]
-  );
 
   const prevMonth = subMonths(currentMonth, 1);
   const nextMonth = addMonths(currentMonth, 1);
@@ -98,17 +80,10 @@ export function WallCalendar() {
       className="min-h-screen flex items-start md:items-center justify-center p-4 md:p-8 bg-background transition-colors duration-300"
       ref={containerRef}
     >
-      <div className="w-full max-w-5xl flex flex-col md:flex-row gap-0 md:gap-0">
-        {/* Notes panel - left on desktop, bottom on mobile */}
-        <div className="hidden md:flex md:w-[280px] md:flex-shrink-0 rounded-l-xl overflow-hidden border border-r-0 border-border shadow-lg">
-          <NotesPanel
-            range={selectedRange}
-            rangeLabel={rangeLabel}
-            text={text}
-            onChange={handleChange}
-            pastNotes={pastNotes}
-            onRestoreRange={handleRestoreRange}
-          />
+      <div className="w-full max-w-6xl flex flex-col md:flex-row gap-0 md:gap-0">
+        {/* Reminders panel - left on desktop */}
+        <div className="hidden md:flex md:w-[320px] md:flex-shrink-0 rounded-l-xl overflow-hidden border border-r-0 border-border shadow-lg">
+          <NotesPanel />
         </div>
 
         {/* Main calendar card */}
@@ -123,7 +98,7 @@ export function WallCalendar() {
 
           {/* Navigation bar */}
           <div className="flex items-center justify-between px-4 py-2 bg-card">
-            <div className="hidden sm:block w-20">
+            <div className="hidden sm:block w-32">
               <MiniMonth month={prevMonth} />
             </div>
 
@@ -157,7 +132,7 @@ export function WallCalendar() {
               </button>
             </div>
 
-            <div className="hidden sm:block w-20">
+            <div className="hidden sm:block w-32">
               <MiniMonth month={nextMonth} />
             </div>
           </div>
@@ -193,16 +168,31 @@ export function WallCalendar() {
           </div>
         </div>
 
-        {/* Notes panel - mobile (bottom) */}
+        {/* Clock + Quick Notes panel — right on desktop */}
+        <div className="hidden md:flex md:w-[250px] md:flex-shrink-0 flex-col rounded-r-xl overflow-hidden border border-l-0 border-border shadow-lg bg-card">
+          {/* Clock section */}
+          <div className="flex flex-col items-center px-4 pt-6 pb-5 gap-3 border-b border-border/50 flex-shrink-0">
+            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Local Time</p>
+            <OrbitalClock />
+            <p className="text-[10px] text-muted-foreground tracking-widest font-mono">[ orbital ]</p>
+          </div>
+          {/* Quick Notes section */}
+          <div className="flex-1 overflow-y-auto px-4 py-4 min-h-0">
+            <QuickNotes selectedRange={selectedRange} />
+          </div>
+        </div>
+
+        {/* Reminders panel - mobile (bottom) */}
         <div className="md:hidden mt-4 rounded-xl overflow-hidden border border-border shadow-lg">
-          <NotesPanel
-            range={selectedRange}
-            rangeLabel={rangeLabel}
-            text={text}
-            onChange={handleChange}
-            pastNotes={pastNotes}
-            onRestoreRange={handleRestoreRange}
-          />
+          <NotesPanel />
+        </div>
+        <div className="md:hidden mt-4 flex flex-col items-center rounded-xl border border-border shadow-lg bg-card py-8 px-4 gap-4">
+          <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Local Time</p>
+          <OrbitalClock />
+          <p className="text-[10px] text-muted-foreground font-mono tracking-widest mt-6">[ orbital ]</p>
+          <div className="w-full border-t border-border/50 pt-4 mt-2">
+            <QuickNotes selectedRange={selectedRange} />
+          </div>
         </div>
       </div>
     </div>

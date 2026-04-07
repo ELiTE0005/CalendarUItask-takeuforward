@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { useState } from "react";
 import { MONTH_THEMES } from "@/data/holidays";
 
 interface HeroImagePanelProps {
@@ -10,15 +11,26 @@ export function HeroImagePanel({ month }: HeroImagePanelProps) {
   const theme = MONTH_THEMES[monthIndex];
   const monthName = format(month, "MMMM");
   const year = format(month, "yyyy");
+  const [imgError, setImgError] = useState(false);
 
   return (
     <div className="relative w-full h-48 md:h-56 overflow-hidden bg-muted">
-      <img
-        src={theme.fallback}
-        alt={`${monthName} ${year} landscape`}
-        className="w-full h-full object-cover"
-        loading="eager"
-      />
+      {imgError ? (
+        /* Beautiful gradient fallback when image fails */
+        <div
+          className="w-full h-full"
+          style={{ background: theme.gradient }}
+        />
+      ) : (
+        <img
+          src={theme.fallback}
+          alt={`${monthName} ${year} landscape`}
+          className="w-full h-full object-cover"
+          loading="eager"
+          onError={() => setImgError(true)}
+        />
+      )}
+
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
 

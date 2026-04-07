@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @layer base {
   :root {
@@ -124,64 +124,181 @@
   }
 
   .calendar-day-btn {
-    @apply relative flex flex-col items-center justify-center rounded-lg text-sm font-medium transition-all duration-150;
-    @apply hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
-    min-height: 44px;
+    @apply relative flex flex-col items-center justify-center text-sm font-medium;
+    min-height: 48px;
     min-width: 44px;
+    /* Only animate color on the button itself — band handled by ::before */
+    transition: color 140ms ease-out;
+    will-change: auto;
   }
 
-  .calendar-day-btn.is-today {
-    @apply font-bold;
+  /* Hover — subtle circle grows out of nothing on non-selected days */
+  .calendar-day-btn:not(.is-start):not(.is-end):not(.is-in-range) > span:first-child:hover {
+    background: hsl(var(--accent) / 0.12);
+    transform: scale(1.08);
   }
 
-  .calendar-day-btn.is-today::after {
+  .calendar-day-btn:focus-visible {
+    outline: none;
+  }
+  .calendar-day-btn:focus-visible > span:first-child {
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+  }
+
+  /* ── NUMBER CIRCLE ──
+     This is the only element animated during drag — keeping transitions cheap.
+     Uses opacity + transform (GPU only, no paint/layout). */
+  .calendar-day-btn > span:first-child {
+    @apply relative z-10 flex items-center justify-center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    will-change: transform, opacity, background-color;
+    transition:
+      background-color 120ms ease-out,
+      color            120ms ease-out,
+      transform        140ms cubic-bezier(0.34, 1.3, 0.64, 1),
+      box-shadow       120ms ease-out,
+      opacity          100ms ease-out;
+  }
+
+  /* ── TODAY dot ── */
+  .calendar-day-btn.is-today > span:first-child {
+    font-weight: 700;
+  }
+  .calendar-day-btn.is-today:not(.is-start):not(.is-end)::after {
     content: '';
-    @apply absolute bottom-1 w-1 h-1 rounded-full;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
     background: hsl(var(--electric-blue));
+    pointer-events: none;
   }
 
-  .calendar-day-btn.is-start,
-  .calendar-day-btn.is-end {
-    background: hsl(var(--electric-blue));
-    color: white;
-    @apply rounded-full shadow-md;
-    box-shadow: 0 2px 8px hsl(var(--electric-blue) / 0.4);
-  }
+  /* ── RANGE BAND ──
+     The ::before pseudo builds the tinted ribbon behind the circle.
+     CRITICAL: only animate opacity + transform — never left/right/width.
+     We keep the band full-width and use scaleX() to "reveal" it per direction. */
 
-  .calendar-day-btn.is-in-range {
+  .calendar-day-btn.is-in-range::before,
+  .calendar-day-btn.is-start::before,
+  .calendar-day-btn.is-end::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 36px;
+    border-radius: 0;
     background: hsl(var(--electric-blue-soft));
-    @apply rounded-none;
+    pointer-events: none;
+    will-change: transform, opacity;
+    transition:
+      opacity   100ms ease-out,
+      transform 120ms ease-out;
+    /* Default: band hidden, scale 0 from center */
+    transform: translateY(-50%) scaleX(0);
+    opacity: 0;
   }
 
-  .dark .calendar-day-btn.is-in-range {
-    background: hsl(var(--electric-blue) / 0.15);
+  .dark .calendar-day-btn.is-in-range::before,
+  .dark .calendar-day-btn.is-start::before,
+  .dark .calendar-day-btn.is-end::before {
+    background: hsl(var(--electric-blue) / 0.18);
   }
 
-  .calendar-day-btn.is-in-range.is-range-start {
-    @apply rounded-l-full;
+  /* In-range: full band visible */
+  .calendar-day-btn.is-in-range::before {
+    transform: translateY(-50%) scaleX(1);
+    transform-origin: center center;
+    opacity: 1;
   }
 
-  .calendar-day-btn.is-in-range.is-range-end {
-    @apply rounded-r-full;
+  /* Start: band blooms rightward from center */
+  .calendar-day-btn.is-start:not(.is-end)::before {
+    transform: translateY(-50%) scaleX(0.5);
+    transform-origin: right center;
+    opacity: 1;
+    border-radius: 0;
   }
 
+  /* End: band blooms leftward from center */
+  .calendar-day-btn.is-end:not(.is-start)::before {
+    transform: translateY(-50%) scaleX(0.5);
+    transform-origin: left center;
+    opacity: 1;
+    border-radius: 0;
+  }
+
+  /* Single-day: no band at all */
+  .calendar-day-btn.is-start.is-end::before {
+    opacity: 0;
+    transform: translateY(-50%) scaleX(0);
+  }
+
+  /* Row-edge rounding at Sunday (range-start) and Saturday (range-end) */
+  .calendar-day-btn.is-in-range.is-range-start::before {
+    border-radius: 18px 0 0 18px;
+    transform: translateY(-50%) scaleX(0.92);
+    transform-origin: right center;
+  }
+  .calendar-day-btn.is-in-range.is-range-end::before {
+    border-radius: 0 18px 18px 0;
+    transform: translateY(-50%) scaleX(0.92);
+    transform-origin: left center;
+  }
+
+  /* ── START / END circles ── */
+  .calendar-day-btn.is-start > span:first-child,
+  .calendar-day-btn.is-end > span:first-child {
+    background: hsl(var(--electric-blue));
+    color: white !important;
+    transform: scale(1.08);
+    box-shadow:
+      0 2px 14px hsl(var(--electric-blue) / 0.50),
+      0 1px 4px  hsl(var(--electric-blue) / 0.30);
+  }
+
+  /* Subtle pop animation when a cell first becomes start/end */
+  .calendar-day-btn.is-start > span:first-child {
+    animation: selectionPop 200ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+  .calendar-day-btn.is-end > span:first-child {
+    animation: selectionPop 200ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+
+  @keyframes selectionPop {
+    0%   { transform: scale(0.85); opacity: 0.6; }
+    60%  { transform: scale(1.12); }
+    100% { transform: scale(1.08); opacity: 1; }
+  }
+
+  /* ── IN-RANGE number style ── */
+  .calendar-day-btn.is-in-range:not(.is-start):not(.is-end) > span:first-child {
+    color: hsl(var(--electric-blue));
+    font-weight: 500;
+  }
+
+  /* ── DIMMED (out of month) ── */
   .calendar-day-btn.is-dimmed {
-    @apply opacity-30;
+    opacity: 0.28;
   }
 
-  .calendar-day-btn.is-weekend {
+  /* ── WEEKEND colour ── */
+  .calendar-day-btn.is-weekend:not(.is-start):not(.is-end):not(.is-in-range) {
     color: hsl(var(--electric-blue));
   }
 
-  .calendar-day-btn.is-start.is-weekend,
-  .calendar-day-btn.is-end.is-weekend {
-    color: white;
-  }
-
   .holiday-dot {
-    @apply absolute bottom-0.5 w-1.5 h-1.5 rounded-full;
+    @apply absolute w-1.5 h-1.5 rounded-full z-20;
+    bottom: 4px;
     background: hsl(0 84% 60%);
   }
+
 
   .page-flip-enter {
     animation: pageFlipIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;

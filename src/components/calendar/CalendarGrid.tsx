@@ -61,6 +61,22 @@ export function CalendarGrid({
     <div
       className="px-3 md:px-5 pb-4 pt-2 select-none"
       ref={gridRef}
+      onPointerDown={(e) => {
+        // Capture ALL pointer events on this container even when cursor
+        // leaves the grid — this is what makes drag reliable.
+        gridRef.current?.setPointerCapture(e.pointerId);
+      }}
+      onPointerMove={(e) => {
+        if (!isDragging) return;
+        // Hit-test the element under the cursor regardless of which element
+        // currently has pointer capture. This never misses cells even at
+        // high pointer speed or when moving through inter-cell gaps.
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        const btn = el?.closest('[data-date]') as HTMLElement | null;
+        if (btn?.dataset.date) {
+          onPointerEnter(new Date(btn.dataset.date));
+        }
+      }}
       onPointerUp={onPointerUp}
       onPointerLeave={() => { if (isDragging) onPointerCancel(); }}
       style={{ touchAction: "none" }}
@@ -112,13 +128,13 @@ export function CalendarGrid({
           const btn = (
             <button
               key={date.toISOString()}
+              data-date={date.toISOString()}
               ref={(el) => setButtonRef(date, el)}
               className={classes}
               onPointerDown={(e) => {
                 e.preventDefault();
                 onPointerDown(date);
               }}
-              onPointerEnter={() => onPointerEnter(date)}
               onKeyDown={(e) => onKeyDown(e, date)}
               aria-label={ariaLabel}
               tabIndex={isFocused ? 0 : inMonth && state.today ? 0 : -1}
