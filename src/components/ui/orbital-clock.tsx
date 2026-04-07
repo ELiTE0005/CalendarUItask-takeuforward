@@ -162,7 +162,7 @@ export function OrbitalClock() {
 
       {/* Date reveal on hover */}
       <div
-        className="absolute w-full flex items-center justify-center -bottom-8 left-1/2 font-mono text-xs tracking-[0.3em] uppercase transition-all duration-500"
+        className="absolute w-full flex items-center justify-center -bottom-10 left-1/2 font-mono text-xs tracking-[0.3em] uppercase transition-all duration-500"
         style={{
           transform: `translateX(-50%) translateY(${isHovered ? 0 : -10}px)`,
           opacity: isHovered ? 1 : 0,

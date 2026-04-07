@@ -171,10 +171,10 @@ export function WallCalendar() {
         {/* Clock + Quick Notes panel — right on desktop */}
         <div className="hidden md:flex md:w-[250px] md:flex-shrink-0 flex-col rounded-r-xl overflow-hidden border border-l-0 border-border shadow-lg bg-card">
           {/* Clock section */}
-          <div className="flex flex-col items-center px-4 pt-6 pb-5 gap-3 border-b border-border/50 flex-shrink-0">
+          <div className="flex flex-col items-center px-4 pt-6 pb-14 gap-3 border-b border-border/50 flex-shrink-0">
             <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Local Time</p>
             <OrbitalClock />
-            <p className="text-[10px] text-muted-foreground tracking-widest font-mono">[ orbital ]</p>
+            <p className="text-[10px] text-muted-foreground tracking-widest font-mono"></p>
           </div>
           {/* Quick Notes section */}
           <div className="flex-1 overflow-y-auto px-4 py-4 min-h-0">
