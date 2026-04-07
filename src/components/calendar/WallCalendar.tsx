@@ -15,12 +15,16 @@ export function WallCalendar() {
     currentMonth,
     calendarDays,
     selectedRange,
+    focusedDate,
     direction,
+    isDragging,
     goNext,
     goPrev,
-    handleDateClick,
-    handleDateHover,
-    handleMouseLeave,
+    handlePointerDown,
+    handlePointerEnter,
+    handlePointerUp,
+    handlePointerCancel,
+    handleKeyDown,
     getDayState,
     rangeLabel,
     setSelectedRange,
@@ -174,10 +178,14 @@ export function WallCalendar() {
                 <CalendarGrid
                   month={currentMonth}
                   days={calendarDays}
+                  focusedDate={focusedDate}
+                  isDragging={isDragging}
                   getDayState={getDayState}
-                  onDateClick={handleDateClick}
-                  onDateHover={handleDateHover}
-                  onMouseLeave={handleMouseLeave}
+                  onPointerDown={handlePointerDown}
+                  onPointerEnter={handlePointerEnter}
+                  onPointerUp={handlePointerUp}
+                  onPointerCancel={handlePointerCancel}
+                  onKeyDown={handleKeyDown}
                 />
               </motion.div>
             </AnimatePresence>

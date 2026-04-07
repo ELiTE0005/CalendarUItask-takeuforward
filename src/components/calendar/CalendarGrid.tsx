@@ -1,4 +1,5 @@
-import { format, isSameMonth } from "date-fns";
+import { useRef, useEffect, useCallback } from "react";
+import { format, isSameDay, isSameMonth } from "date-fns";
 import { getHolidaysForMonth } from "@/data/holidays";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -7,6 +8,8 @@ const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 interface CalendarGridProps {
   month: Date;
   days: Date[];
+  focusedDate: Date | null;
+  isDragging: boolean;
   getDayState: (date: Date) => {
     inMonth: boolean;
     today: boolean;
@@ -15,29 +18,59 @@ interface CalendarGridProps {
     isEnd: boolean;
     isInRange: boolean;
   };
-  onDateClick: (date: Date) => void;
-  onDateHover: (date: Date) => void;
-  onMouseLeave: () => void;
+  onPointerDown: (date: Date) => void;
+  onPointerEnter: (date: Date) => void;
+  onPointerUp: () => void;
+  onPointerCancel: () => void;
+  onKeyDown: (e: React.KeyboardEvent, date: Date) => void;
 }
 
 export function CalendarGrid({
   month,
   days,
+  focusedDate,
+  isDragging,
   getDayState,
-  onDateClick,
-  onDateHover,
-  onMouseLeave,
+  onPointerDown,
+  onPointerEnter,
+  onPointerUp,
+  onPointerCancel,
+  onKeyDown,
 }: CalendarGridProps) {
   const holidays = getHolidaysForMonth(month.getMonth());
   const holidayMap = new Map(holidays.map((h) => [h.day, h.name]));
+  const gridRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+
+  // Focus management for keyboard nav
+  useEffect(() => {
+    if (focusedDate) {
+      const key = focusedDate.toISOString();
+      const btn = buttonRefs.current.get(key);
+      btn?.focus();
+    }
+  }, [focusedDate]);
+
+  const setButtonRef = useCallback((date: Date, el: HTMLButtonElement | null) => {
+    const key = date.toISOString();
+    if (el) buttonRefs.current.set(key, el);
+    else buttonRefs.current.delete(key);
+  }, []);
 
   return (
-    <div className="px-3 md:px-5 pb-4 pt-2" onMouseLeave={onMouseLeave}>
+    <div
+      className="px-3 md:px-5 pb-4 pt-2 select-none"
+      ref={gridRef}
+      onPointerUp={onPointerUp}
+      onPointerLeave={() => { if (isDragging) onPointerCancel(); }}
+      style={{ touchAction: "none" }}
+    >
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 mb-1">
+      <div className="grid grid-cols-7 mb-1" role="row">
         {WEEKDAYS.map((day, i) => (
           <div
             key={day}
+            role="columnheader"
             className={`text-center text-[11px] font-semibold tracking-wider py-2 ${
               i === 0 || i === 6 ? "text-electric-blue" : "text-muted-foreground"
             }`}
@@ -48,12 +81,13 @@ export function CalendarGrid({
       </div>
 
       {/* Day grid */}
-      <div className="grid grid-cols-7">
+      <div className="grid grid-cols-7" role="grid" aria-label="Calendar dates">
         {days.map((date) => {
           const state = getDayState(date);
           const dayNum = date.getDate();
           const inMonth = isSameMonth(date, month);
           const holiday = inMonth ? holidayMap.get(dayNum) : undefined;
+          const isFocused = focusedDate && isSameDay(date, focusedDate);
 
           const classes = [
             "calendar-day-btn",
@@ -78,11 +112,17 @@ export function CalendarGrid({
           const btn = (
             <button
               key={date.toISOString()}
+              ref={(el) => setButtonRef(date, el)}
               className={classes}
-              onClick={() => onDateClick(date)}
-              onMouseEnter={() => onDateHover(date)}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                onPointerDown(date);
+              }}
+              onPointerEnter={() => onPointerEnter(date)}
+              onKeyDown={(e) => onKeyDown(e, date)}
               aria-label={ariaLabel}
-              tabIndex={inMonth ? 0 : -1}
+              tabIndex={isFocused ? 0 : inMonth && state.today ? 0 : -1}
+              role="gridcell"
             >
               <span className="relative z-10">{dayNum}</span>
               {holiday && <span className="holiday-dot" />}
