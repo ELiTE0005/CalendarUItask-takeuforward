@@ -1,4 +1,4 @@
-import { format, isSameMonth, getDay } from "date-fns";
+import { format, isSameMonth } from "date-fns";
 import { getHolidaysForMonth } from "@/data/holidays";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
