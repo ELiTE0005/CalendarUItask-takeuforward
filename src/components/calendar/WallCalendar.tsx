@@ -1,4 +1,5 @@
 import { useCallback, useState, useEffect, useRef } from "react";
+// Force HMR re-mount
 import { AnimatePresence, motion } from "framer-motion";
 import { addMonths, subMonths, parseISO } from "date-fns";
 import { ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
