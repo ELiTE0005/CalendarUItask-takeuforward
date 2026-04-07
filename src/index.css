@@ -2,95 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --background: 210 20% 98%;
+    --foreground: 222 84% 5%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 222 84% 5%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 84% 5%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+    --radius: 0.75rem;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    --navy: 222 84% 5%;
+    --navy-light: 217 33% 17%;
+    --electric-blue: 217 91% 60%;
+    --electric-blue-soft: 217 91% 95%;
+    --warm-gray: 210 40% 98%;
+    --paper: 40 33% 99%;
+    --paper-lines: 220 13% 91%;
+    --calendar-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.25);
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 217 91% 60%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222 84% 5%;
     --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
+    --card: 217 33% 10%;
     --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
+    --popover: 217 33% 10%;
     --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --navy: 210 40% 98%;
+    --navy-light: 215 20% 65%;
+    --warm-gray: 217 33% 12%;
+    --paper: 217 33% 10%;
+    --paper-lines: 217 33% 17%;
+    --calendar-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.5);
+
+    --sidebar-background: 217 33% 10%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -98,8 +89,121 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .spiral-hole {
+    @apply w-5 h-5 rounded-full border-2;
+    border-color: hsl(var(--border));
+    background: hsl(var(--background));
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .dark .spiral-hole {
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .spiral-wire {
+    @apply absolute w-7 h-10 border-2 rounded-full;
+    border-color: hsl(var(--muted-foreground) / 0.4);
+    top: -12px;
+  }
+
+  .notes-ruled {
+    background-image: repeating-linear-gradient(
+      transparent,
+      transparent 31px,
+      hsl(var(--paper-lines)) 31px,
+      hsl(var(--paper-lines)) 32px
+    );
+    background-position: 0 8px;
+  }
+
+  .calendar-day-btn {
+    @apply relative flex flex-col items-center justify-center rounded-lg text-sm font-medium transition-all duration-150;
+    @apply hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .calendar-day-btn.is-today {
+    @apply font-bold;
+  }
+
+  .calendar-day-btn.is-today::after {
+    content: '';
+    @apply absolute bottom-1 w-1 h-1 rounded-full;
+    background: hsl(var(--electric-blue));
+  }
+
+  .calendar-day-btn.is-start,
+  .calendar-day-btn.is-end {
+    background: hsl(var(--electric-blue));
+    color: white;
+    @apply rounded-full shadow-md;
+    box-shadow: 0 2px 8px hsl(var(--electric-blue) / 0.4);
+  }
+
+  .calendar-day-btn.is-in-range {
+    background: hsl(var(--electric-blue-soft));
+    @apply rounded-none;
+  }
+
+  .dark .calendar-day-btn.is-in-range {
+    background: hsl(var(--electric-blue) / 0.15);
+  }
+
+  .calendar-day-btn.is-in-range.is-range-start {
+    @apply rounded-l-full;
+  }
+
+  .calendar-day-btn.is-in-range.is-range-end {
+    @apply rounded-r-full;
+  }
+
+  .calendar-day-btn.is-dimmed {
+    @apply opacity-30;
+  }
+
+  .calendar-day-btn.is-weekend {
+    color: hsl(var(--electric-blue));
+  }
+
+  .calendar-day-btn.is-start.is-weekend,
+  .calendar-day-btn.is-end.is-weekend {
+    color: white;
+  }
+
+  .holiday-dot {
+    @apply absolute bottom-0.5 w-1.5 h-1.5 rounded-full;
+    background: hsl(0 84% 60%);
+  }
+
+  .page-flip-enter {
+    animation: pageFlipIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    transform-origin: top center;
+  }
+
+  .page-flip-exit {
+    animation: pageFlipOut 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    transform-origin: top center;
+  }
+
+  @keyframes pageFlipOut {
+    0% { transform: perspective(1200px) rotateX(0deg); opacity: 1; }
+    100% { transform: perspective(1200px) rotateX(-90deg); opacity: 0; }
+  }
+
+  @keyframes pageFlipIn {
+    0% { transform: perspective(1200px) rotateX(90deg); opacity: 0; }
+    100% { transform: perspective(1200px) rotateX(0deg); opacity: 1; }
+  }
+
+  .diagonal-cut {
+    clip-path: polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%);
   }
 }
