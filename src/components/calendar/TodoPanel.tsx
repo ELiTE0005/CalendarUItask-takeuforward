@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion, PanInfo } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { X, Plus, GripVertical, Check, Trash2, ClipboardList, Calendar } from "lucide-react";
 import { format, parseISO, isToday, isBefore, startOfDay } from "date-fns";
 import type { useTodos, Todo } from "@/hooks/useTodos";
@@ -38,7 +38,6 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
   const [inputDate, setInputDate] = useState(todayStr());
   const [dragOverZone, setDragOverZone] = useState<"todo" | "done" | null>(null);
   const draggedId = useRef<string | null>(null);
-  const boardRef = useRef<HTMLDivElement>(null);
 
   const pendingTodos = todos.filter((t) => !t.done);
   const doneTodos = todos.filter((t) => t.done);
@@ -50,25 +49,7 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
   };
 
   const handleDragStart = (id: string) => { draggedId.current = id; };
-  
-  const handleDragEnd = (id: string, info: PanInfo) => { 
-    draggedId.current = null; 
-    setDragOverZone(null);
-
-    if (!boardRef.current) return;
-    const rect = boardRef.current.getBoundingClientRect();
-    
-    // Ensure the drop is somewhat within the board vertically (with some leniency)
-    if (info.point.y < rect.top - 50 || info.point.y > rect.bottom + 50) return;
-
-    // Check left vs right half bounds
-    const midPoint = rect.left + rect.width / 2;
-    if (info.point.x >= rect.left && info.point.x < midPoint) {
-      setDone(id, false);
-    } else if (info.point.x >= midPoint && info.point.x <= rect.right) {
-      setDone(id, true);
-    }
-  };
+  const handleDragEnd = () => { draggedId.current = null; setDragOverZone(null); };
 
   const handleDropOnZone = (done: boolean) => {
     if (draggedId.current) setDone(draggedId.current, done);
@@ -163,11 +144,10 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
         </div>
 
         {/* Two-column board */}
-        <div ref={boardRef} className="grid grid-cols-2 divide-x divide-border flex-1 overflow-hidden">
+        <div className="grid grid-cols-2 divide-x divide-border flex-1 overflow-hidden">
 
           {/* TO DO */}
           <div
-            data-zone="todo"
             className={`flex flex-col p-4 transition-colors duration-200 ${dragOverZone === "todo" ? "bg-electric-blue/5" : "bg-card"}`}
             onDragOver={(e) => { e.preventDefault(); setDragOverZone("todo"); }}
             onDragLeave={() => setDragOverZone(null)}
@@ -192,7 +172,7 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
                     onToggle={() => toggleTodo(todo.id)}
                     onDelete={() => deleteTodo(todo.id)}
                     onDragStart={() => handleDragStart(todo.id)}
-                    onDragEnd={(info) => handleDragEnd(todo.id, info)}
+                    onDragEnd={handleDragEnd}
                     onDateChange={(d) => updateDueDate(todo.id, d)}
                     isDone={false}
                   />
@@ -209,7 +189,6 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
 
           {/* DONE */}
           <div
-            data-zone="done"
             className={`flex flex-col p-4 transition-colors duration-200 ${dragOverZone === "done" ? "bg-green-500/5" : "bg-muted/25"}`}
             onDragOver={(e) => { e.preventDefault(); setDragOverZone("done"); }}
             onDragLeave={() => setDragOverZone(null)}
@@ -234,7 +213,7 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
                     onToggle={() => toggleTodo(todo.id)}
                     onDelete={() => deleteTodo(todo.id)}
                     onDragStart={() => handleDragStart(todo.id)}
-                    onDragEnd={(info) => handleDragEnd(todo.id, info)}
+                    onDragEnd={handleDragEnd}
                     onDateChange={(d) => updateDueDate(todo.id, d)}
                     isDone={true}
                   />
@@ -273,7 +252,7 @@ interface TodoCardProps {
   onToggle: () => void;
   onDelete: () => void;
   onDragStart: () => void;
-  onDragEnd: (info: PanInfo) => void;
+  onDragEnd: () => void;
   onDateChange: (date?: string) => void;
   isDone: boolean;
 }
@@ -288,12 +267,10 @@ function TodoCard({ todo, onToggle, onDelete, onDragStart, onDragEnd, onDateChan
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
-      drag
-      dragSnapToOrigin
-      whileDrag={{ zIndex: 50, scale: 1.05, opacity: 0.9 }}
+      draggable
       onDragStart={onDragStart}
-      onDragEnd={(e, info) => onDragEnd(info)}
-      className={`group flex flex-col gap-1.5 p-3 rounded-xl border bg-card shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-200 select-none ${isDone ? "border-border/40 opacity-65" : "border-border hover:border-electric-blue/30"}`}
+      onDragEnd={onDragEnd}
+      className={`group flex flex-col gap-1.5 p-3 rounded-xl border bg-card shadow-sm cursor-grab active:cursor-grabbing active:opacity-50 active:scale-95 hover:shadow-md transition-all duration-200 select-none ${isDone ? "border-border/40 opacity-65" : "border-border hover:border-electric-blue/30"}`}
     >
       <div className="flex items-center gap-2">
         <GripVertical className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground/20 group-hover:text-muted-foreground/50" />
