@@ -15,8 +15,6 @@ import { WeatherWidget } from "@/components/ui/WeatherWidget";
 import { useWeather } from "@/hooks/useWeather";
 import { QuickNotes } from "./QuickNotes";
 
-type MobileTab = "calendar" | "reminders" | "notes";
-
 export function WallCalendar() {
   const {
     currentMonth,
@@ -35,7 +33,6 @@ export function WallCalendar() {
     getDayState,
   } = useCalendar();
   const [isDark, setIsDark] = useState(false);
-  const [mobileTab, setMobileTab] = useState<MobileTab>("calendar");
   const containerRef = useRef<HTMLDivElement>(null);
   const weather = useWeather();
 
@@ -205,101 +202,34 @@ export function WallCalendar() {
       </div>
 
       {/* ═══════════════════════════════════════
-          MOBILE layout (<md): full-screen tabs
+          MOBILE layout (<md): vertically stacked
           ═══════════════════════════════════════ */}
-      <div className="md:hidden flex flex-col" style={{ height: "100dvh" }}>
-
-        {/* Tab content — fills all available space above the tab bar */}
-        <div className="flex-1 overflow-hidden">
-          <AnimatePresence mode="wait">
-
-            {/* ── CALENDAR TAB ── */}
-            {mobileTab === "calendar" && (
-              <motion.div
-                key="calendar"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-                className="h-full overflow-y-auto"
-              >
-                <div className="min-h-full bg-card border border-border shadow-2xl">
-                  {CalendarCard}
-                </div>
-              </motion.div>
-            )}
-
-            {/* ── REMINDERS TAB ── */}
-            {mobileTab === "reminders" && (
-              <motion.div
-                key="reminders"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-                className="h-full flex flex-col bg-card"
-              >
-                <div className="flex-1 overflow-hidden flex flex-col">
-                  <NotesPanel />
-                </div>
-                <div className="p-4 border-t border-border/50 flex-shrink-0 relative z-10">
-                  <WeatherWidget weather={weather} />
-                </div>
-              </motion.div>
-            )}
-
-            {/* ── NOTES TAB ── */}
-            {mobileTab === "notes" && (
-              <motion.div
-                key="notes"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-                className="h-full overflow-y-auto bg-card"
-              >
-                {/* Mini clock header */}
-                <div className="flex flex-col items-center px-4 pt-8 pb-14 gap-3 border-b border-border/50 bg-card">
-                  <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Local Time</p>
-                  <OrbitalClock />
-                </div>
-                {/* Quick notes */}
-                <div className="px-4 py-5">
-                  <QuickNotes selectedRange={selectedRange} />
-                </div>
-              </motion.div>
-            )}
-
-          </AnimatePresence>
+      <div className="md:hidden flex flex-col w-full px-4 py-8 gap-6 relative z-10">
+        
+        {/* Top: The Main Calendar Component */}
+        <div className="w-full bg-card border border-border shadow-2xl rounded-xl">
+          {CalendarCard}
         </div>
 
-        {/* ── BOTTOM TAB BAR ── */}
-        <nav className="flex-shrink-0 flex items-stretch border-t border-border bg-card/95 backdrop-blur-md"
-             style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-          {(
-            [
-              { id: "calendar",   label: "Calendar",   icon: CalendarDays },
-              { id: "reminders",  label: "Reminders",  icon: Bell },
-              { id: "notes",      label: "Notes",      icon: FileText },
-            ] as { id: MobileTab; label: string; icon: React.ElementType }[]
-          ).map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setMobileTab(id)}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-semibold uppercase tracking-wider transition-all duration-200
-                ${mobileTab === id
-                  ? "text-electric-blue"
-                  : "text-muted-foreground/50 hover:text-muted-foreground"
-                }`}
-            >
-              <Icon className={`w-5 h-5 transition-transform duration-200 ${mobileTab === id ? "scale-110" : ""}`} />
-              {label}
-              {/* Active indicator dot */}
-              <span className={`w-1 h-1 rounded-full transition-all duration-200 ${mobileTab === id ? "bg-electric-blue opacity-100" : "opacity-0"}`} />
-            </button>
-          ))}
-        </nav>
+        {/* Middle: Weather & Quick Notes & Clock */}
+        <div className="w-full bg-card border border-border shadow-lg rounded-xl overflow-hidden flex flex-col">
+          <div className="flex flex-col items-center px-4 pt-8 pb-10 gap-3 border-b border-border/50 bg-card">
+            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Local Time</p>
+            <OrbitalClock />
+            <p className="text-[10px] text-muted-foreground tracking-widest font-mono"></p>
+          </div>
+          <div className="p-4 border-b border-border/50">
+            <WeatherWidget weather={weather} />
+          </div>
+          <div className="p-4 bg-muted/5">
+            <QuickNotes selectedRange={selectedRange} />
+          </div>
+        </div>
 
+        {/* Bottom: The Reminders Section */}
+        <div className="w-full bg-card border border-border shadow-lg rounded-xl overflow-hidden min-h-[500px] flex flex-col mb-10">
+          <NotesPanel />
+        </div>
       </div>
     </div>
   );
