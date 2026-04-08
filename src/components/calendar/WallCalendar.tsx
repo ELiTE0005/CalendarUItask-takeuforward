@@ -89,7 +89,7 @@ export function WallCalendar() {
   /* ── The shared calendar card (used in both mobile & desktop) ── */
   const CalendarCard = (
     <div
-      className="flex-1 rounded-xl md:rounded-l-none overflow-hidden shadow-2xl bg-card border border-border"
+      className="flex-1 rounded-xl md:rounded-none shadow-2xl bg-card border border-border relative z-20"
       style={{ boxShadow: "var(--calendar-shadow)" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -98,7 +98,7 @@ export function WallCalendar() {
       <SpiralBinding />
 
       {/* Navigation bar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-card">
+      <div className="flex items-center justify-between px-4 pb-2 pt-6 bg-card">
         <div className="hidden sm:block w-32">
           <MiniMonth month={prevMonth} />
         </div>
@@ -172,7 +172,7 @@ export function WallCalendar() {
       {/* ═══════════════════════════════════════
           DESKTOP layout (md+): unchanged 3-col
           ═══════════════════════════════════════ */}
-      <div className="hidden md:flex md:min-h-screen md:items-center md:justify-center md:p-8">
+      <div className="hidden md:flex md:min-h-screen md:items-center md:justify-center md:px-8 md:py-12">
         <div className="w-full max-w-6xl flex flex-row gap-0">
           {/* Left: Reminders + Weather */}
           <div className="w-[320px] flex-shrink-0 flex flex-col rounded-l-xl overflow-hidden border border-r-0 border-border shadow-lg bg-card z-10">
