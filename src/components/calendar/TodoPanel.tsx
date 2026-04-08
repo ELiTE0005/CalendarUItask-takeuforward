@@ -38,6 +38,7 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
   const [inputDate, setInputDate] = useState(todayStr());
   const [dragOverZone, setDragOverZone] = useState<"todo" | "done" | null>(null);
   const draggedId = useRef<string | null>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
 
   const pendingTodos = todos.filter((t) => !t.done);
   const doneTodos = todos.filter((t) => t.done);
@@ -54,13 +55,17 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
     draggedId.current = null; 
     setDragOverZone(null);
 
-    // Identify which zone the user dropped the card on
-    const elem = document.elementFromPoint(info.point.x, info.point.y);
-    const dropZone = elem?.closest('[data-zone]')?.getAttribute('data-zone');
+    if (!boardRef.current) return;
+    const rect = boardRef.current.getBoundingClientRect();
+    
+    // Ensure the drop is somewhat within the board vertically (with some leniency)
+    if (info.point.y < rect.top - 50 || info.point.y > rect.bottom + 50) return;
 
-    if (dropZone === "todo") {
+    // Check left vs right half bounds
+    const midPoint = rect.left + rect.width / 2;
+    if (info.point.x >= rect.left && info.point.x < midPoint) {
       setDone(id, false);
-    } else if (dropZone === "done") {
+    } else if (info.point.x >= midPoint && info.point.x <= rect.right) {
       setDone(id, true);
     }
   };
@@ -158,7 +163,7 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
         </div>
 
         {/* Two-column board */}
-        <div className="grid grid-cols-2 divide-x divide-border flex-1 overflow-hidden">
+        <div ref={boardRef} className="grid grid-cols-2 divide-x divide-border flex-1 overflow-hidden">
 
           {/* TO DO */}
           <div
