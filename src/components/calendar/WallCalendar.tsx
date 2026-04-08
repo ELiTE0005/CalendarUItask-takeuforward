@@ -42,6 +42,12 @@ export function WallCalendar() {
 
   const handleTouchEnd = useCallback(
     (e: React.TouchEvent) => {
+      // Prevent swipe-to-change-month if dragging on the calendar grid
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('.calendar-day-btn') || target?.closest('[role="grid"]')) {
+        return;
+      }
+
       const diff = e.changedTouches[0].clientX - touchStartX.current;
       if (Math.abs(diff) > 60) {
         if (diff > 0) goPrev();
