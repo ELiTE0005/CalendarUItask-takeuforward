@@ -9,6 +9,10 @@ import { CalendarGrid } from "./CalendarGrid";
 import { NotesPanel } from "./NotesPanel";
 import { MiniMonth } from "./MiniMonth";
 import { OrbitalClock } from "@/components/ui/orbital-clock";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { WeatherBackground, WeatherBadge } from "@/components/ui/WeatherBackground";
+import { WeatherWidget } from "@/components/ui/WeatherWidget";
+import { useWeather } from "@/hooks/useWeather";
 import { QuickNotes } from "./QuickNotes";
 
 type MobileTab = "calendar" | "reminders" | "notes";
@@ -33,6 +37,7 @@ export function WallCalendar() {
   const [isDark, setIsDark] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>("calendar");
   const containerRef = useRef<HTMLDivElement>(null);
+  const weather = useWeather();
 
   // Touch swipe (calendar tab only)
   const touchStartX = useRef(0);
@@ -102,6 +107,7 @@ export function WallCalendar() {
         </div>
 
         <div className="flex items-center gap-2">
+          <WeatherBadge mood={weather.mood} temperature={weather.temperature} loading={weather.loading} />
           <button
             onClick={goPrev}
             className="p-2 rounded-full hover:bg-accent/10 transition-colors"
@@ -110,17 +116,7 @@ export function WallCalendar() {
             <ChevronLeft className="w-5 h-5 text-foreground" />
           </button>
 
-          <button
-            onClick={() => setIsDark(!isDark)}
-            className="p-2 rounded-full hover:bg-accent/10 transition-colors"
-            aria-label="Toggle dark mode"
-          >
-            {isDark ? (
-              <Sun className="w-4 h-4 text-foreground" />
-            ) : (
-              <Moon className="w-4 h-4 text-foreground" />
-            )}
-          </button>
+          <ThemeToggle isDark={isDark} onToggle={setIsDark} />
 
           <button
             onClick={goNext}
@@ -170,25 +166,32 @@ export function WallCalendar() {
 
   return (
     <div
-      className="bg-background transition-colors duration-300"
+      className="bg-background transition-colors duration-300 relative"
       ref={containerRef}
     >
+      {/* ── Weather animated background ── */}
+      <WeatherBackground mood={weather.mood} isDark={isDark} />
 
       {/* ═══════════════════════════════════════
           DESKTOP layout (md+): unchanged 3-col
           ═══════════════════════════════════════ */}
       <div className="hidden md:flex md:min-h-screen md:items-center md:justify-center md:p-8">
         <div className="w-full max-w-6xl flex flex-row gap-0">
-          {/* Left: Reminders */}
-          <div className="w-[320px] flex-shrink-0 rounded-l-xl overflow-hidden border border-r-0 border-border shadow-lg flex">
-            <NotesPanel />
+          {/* Left: Reminders + Weather */}
+          <div className="w-[320px] flex-shrink-0 flex flex-col rounded-l-xl overflow-hidden border border-r-0 border-border shadow-lg bg-card z-10">
+            <div className="flex-1 overflow-hidden">
+              <NotesPanel />
+            </div>
+            <div className="px-4 py-4 flex-shrink-0 border-t border-border/50 max-h-[300px]">
+              <WeatherWidget weather={weather} />
+            </div>
           </div>
 
           {/* Center: Calendar */}
           {CalendarCard}
 
           {/* Right: Clock + Quick Notes */}
-          <div className="w-[250px] flex-shrink-0 flex flex-col rounded-r-xl overflow-hidden border border-l-0 border-border shadow-lg bg-card">
+          <div className="w-[250px] flex-shrink-0 flex flex-col rounded-r-xl overflow-hidden border border-l-0 border-border shadow-lg bg-card z-10">
             <div className="flex flex-col items-center px-4 pt-6 pb-14 gap-3 border-b border-border/50 flex-shrink-0">
               <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Local Time</p>
               <OrbitalClock />
@@ -234,10 +237,13 @@ export function WallCalendar() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.2 }}
-                className="h-full flex flex-col"
+                className="h-full flex flex-col bg-card"
               >
                 <div className="flex-1 overflow-hidden flex flex-col">
                   <NotesPanel />
+                </div>
+                <div className="p-4 border-t border-border/50 flex-shrink-0 relative z-10">
+                  <WeatherWidget weather={weather} />
                 </div>
               </motion.div>
             )}

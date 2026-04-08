@@ -1,0 +1,267 @@
+/* ═══════════════════════════════════════════════
+   WEATHER BACKGROUND — pure CSS animations
+   All particles use transform/opacity only (GPU).
+   ═══════════════════════════════════════════════ */
+
+/* ── Shared wrapper ── */
+.weather-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  transition: background 2s ease;
+}
+
+/* ────────────────────────────────
+   SUMMER — golden sun rays
+   ──────────────────────────────── */
+.weather-bg.summer {
+  background: radial-gradient(
+    ellipse 110% 80% at 50% -10%,
+    rgba(255, 200, 50, 0.12) 0%,
+    rgba(255, 150, 30, 0.06) 50%,
+    transparent 70%
+  );
+}
+
+.weather-bg.summer .sun-origin {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160px;
+  height: 160px;
+}
+
+.weather-bg.summer .sun-core {
+  position: absolute;
+  inset: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,220,60,0.55) 0%, rgba(255,180,20,0.2) 60%, transparent 100%);
+  animation: sun-pulse 4s ease-in-out infinite;
+}
+
+@keyframes sun-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50%       { transform: scale(1.12); opacity: 1; }
+}
+
+.weather-bg.summer .sun-ray {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 2px;
+  transform-origin: 0 50%;
+  background: linear-gradient(to right, rgba(255,210,50,0.35), transparent);
+  border-radius: 2px;
+  animation: ray-rotate 12s linear infinite;
+}
+
+@keyframes ray-rotate {
+  from { transform: rotate(var(--start-angle)); }
+  to   { transform: rotate(calc(var(--start-angle) + 360deg)); }
+}
+
+/* Heat shimmer at bottom */
+.weather-bg.summer .shimmer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to top, rgba(255,180,30,0.07), transparent);
+  animation: shimmer-wave 3s ease-in-out infinite alternate;
+}
+
+@keyframes shimmer-wave {
+  from { opacity: 0.4; transform: scaleX(1); }
+  to   { opacity: 1;   transform: scaleX(1.02); }
+}
+
+
+/* ────────────────────────────────
+   MONSOON — rain
+   ──────────────────────────────── */
+.weather-bg.monsoon {
+  background: linear-gradient(
+    160deg,
+    rgba(30, 50, 90, 0.1) 0%,
+    rgba(20, 40, 80, 0.06) 40%,
+    transparent 70%
+  );
+}
+
+.weather-bg.monsoon .cloud-band {
+  position: absolute;
+  top: -40px;
+  left: -5%;
+  right: -5%;
+  height: 110px;
+  background: linear-gradient(to bottom, rgba(80,100,140,0.18) 0%, transparent 100%);
+  border-radius: 50%;
+  animation: cloud-drift 8s ease-in-out infinite alternate;
+  filter: blur(15px);
+}
+
+@keyframes cloud-drift {
+  from { transform: translateX(-2%); }
+  to   { transform: translateX(2%); }
+}
+
+.weather-bg.monsoon .raindrop {
+  position: absolute;
+  top: -20px;
+  width: 1.5px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, transparent, rgba(140,180,255,0.55));
+  animation: rain-fall linear infinite;
+  transform: rotate(10deg);
+}
+
+@keyframes rain-fall {
+  from { transform: rotate(10deg) translateY(-20px); }
+  to   { transform: rotate(10deg) translateY(110vh); }
+}
+
+/* ────────────────────────────────
+   WINTER — snowflakes
+   ──────────────────────────────── */
+.weather-bg.winter {
+  background: radial-gradient(
+    ellipse 100% 60% at 50% 0%,
+    rgba(180, 210, 255, 0.1) 0%,
+    rgba(140, 180, 240, 0.05) 50%,
+    transparent 70%
+  );
+}
+
+.weather-bg.winter .snowflake {
+  position: absolute;
+  top: -12px;
+  border-radius: 50%;
+  background: rgba(220, 235, 255, 0.85);
+  animation: snow-fall linear infinite;
+  filter: blur(0.5px);
+}
+
+@keyframes snow-fall {
+  0%   { transform: translateY(-10px) translateX(0) rotate(0deg); opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 0.8; }
+  100% { transform: translateY(105vh) translateX(var(--drift)) rotate(360deg); opacity: 0; }
+}
+
+/* frost edge */
+.weather-bg.winter .frost {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 15% at 0% 100%, rgba(180,220,255,0.1), transparent),
+    radial-gradient(ellipse 60% 15% at 100% 100%, rgba(180,220,255,0.1), transparent);
+}
+
+
+/* ────────────────────────────────
+   SPRING — cherry blossom petals
+   ──────────────────────────────── */
+.weather-bg.spring {
+  background: radial-gradient(
+    ellipse 100% 60% at 50% 0%,
+    rgba(255, 182, 193, 0.08) 0%,
+    rgba(144, 238, 144, 0.04) 60%,
+    transparent 80%
+  );
+}
+
+.weather-bg.spring .petal {
+  position: absolute;
+  top: -20px;
+  border-radius: 50% 0 50% 0;
+  animation: petal-fall linear infinite;
+}
+
+@keyframes petal-fall {
+  0%   { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 0; }
+  8%   { opacity: 0.85; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(105vh) translateX(var(--sway)) rotate(var(--spin)); opacity: 0; }
+}
+
+
+/* ────────────────────────────────
+   AUTUMN — falling leaves
+   ──────────────────────────────── */
+.weather-bg.autumn {
+  background: radial-gradient(
+    ellipse 100% 60% at 50% 0%,
+    rgba(210, 120, 40, 0.08) 0%,
+    rgba(180, 80, 20, 0.04) 50%,
+    transparent 70%
+  );
+}
+
+.weather-bg.autumn .leaf {
+  position: absolute;
+  top: -20px;
+  border-radius: 50% 5% 50% 5%;
+  animation: leaf-fall linear infinite;
+}
+
+@keyframes leaf-fall {
+  0%   { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.9; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(105vh) translateX(var(--sway)) rotate(var(--spin)); opacity: 0; }
+}
+
+
+/* ────────────────────────────────
+   CLOUDY — slow drifting clouds
+   ──────────────────────────────── */
+.weather-bg.cloudy {
+  background: linear-gradient(
+    175deg,
+    rgba(140, 155, 180, 0.07) 0%,
+    transparent 50%
+  );
+}
+
+.weather-bg.cloudy .cloud-puff {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(200, 210, 230, 0.12);
+  filter: blur(30px);
+  animation: cloud-puff-drift linear infinite;
+}
+
+@keyframes cloud-puff-drift {
+  from { transform: translateX(-120%); }
+  to   { transform: translateX(120vw); }
+}
+
+/* ── Weather badge (shows temp + mood) ── */
+.weather-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  color: var(--badge-color, rgba(100,116,139,0.9));
+  background: var(--badge-bg, rgba(241,245,249,0.8));
+  border: 1px solid var(--badge-border, rgba(0,0,0,0.07));
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.dark .weather-badge {
+  --badge-color: rgba(148,163,184,0.9);
+  --badge-bg: rgba(30,41,59,0.7);
+  --badge-border: rgba(255,255,255,0.08);
+}

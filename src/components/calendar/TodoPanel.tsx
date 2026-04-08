@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Plus, GripVertical, Check, Trash2, ClipboardList, Calendar } from "lucide-react";
 import { format, parseISO, isToday, isBefore, startOfDay } from "date-fns";
@@ -55,7 +56,11 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
     setDragOverZone(null);
   };
 
-  return (
+  // Portal mounting
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  const content = (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
       onClick={onClose}
@@ -236,6 +241,9 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
       </motion.div>
     </div>
   );
+
+  if (!mounted) return null;
+  return createPortal(content, document.body);
 }
 
 /* ── Individual todo card ── */
