@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, PanInfo } from "framer-motion";
 import { X, Plus, GripVertical, Check, Trash2, ClipboardList, Calendar } from "lucide-react";
 import { format, parseISO, isToday, isBefore, startOfDay } from "date-fns";
 import type { useTodos, Todo } from "@/hooks/useTodos";
@@ -49,7 +49,21 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
   };
 
   const handleDragStart = (id: string) => { draggedId.current = id; };
-  const handleDragEnd = () => { draggedId.current = null; setDragOverZone(null); };
+  
+  const handleDragEnd = (id: string, info: PanInfo) => { 
+    draggedId.current = null; 
+    setDragOverZone(null);
+
+    // Identify which zone the user dropped the card on
+    const elem = document.elementFromPoint(info.point.x, info.point.y);
+    const dropZone = elem?.closest('[data-zone]')?.getAttribute('data-zone');
+
+    if (dropZone === "todo") {
+      setDone(id, false);
+    } else if (dropZone === "done") {
+      setDone(id, true);
+    }
+  };
 
   const handleDropOnZone = (done: boolean) => {
     if (draggedId.current) setDone(draggedId.current, done);
@@ -148,6 +162,7 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
 
           {/* TO DO */}
           <div
+            data-zone="todo"
             className={`flex flex-col p-4 transition-colors duration-200 ${dragOverZone === "todo" ? "bg-electric-blue/5" : "bg-card"}`}
             onDragOver={(e) => { e.preventDefault(); setDragOverZone("todo"); }}
             onDragLeave={() => setDragOverZone(null)}
@@ -172,7 +187,7 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
                     onToggle={() => toggleTodo(todo.id)}
                     onDelete={() => deleteTodo(todo.id)}
                     onDragStart={() => handleDragStart(todo.id)}
-                    onDragEnd={handleDragEnd}
+                    onDragEnd={(info) => handleDragEnd(todo.id, info)}
                     onDateChange={(d) => updateDueDate(todo.id, d)}
                     isDone={false}
                   />
@@ -189,6 +204,7 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
 
           {/* DONE */}
           <div
+            data-zone="done"
             className={`flex flex-col p-4 transition-colors duration-200 ${dragOverZone === "done" ? "bg-green-500/5" : "bg-muted/25"}`}
             onDragOver={(e) => { e.preventDefault(); setDragOverZone("done"); }}
             onDragLeave={() => setDragOverZone(null)}
@@ -213,7 +229,7 @@ export function TodoPanel({ onClose, todoState }: TodoPanelProps) {
                     onToggle={() => toggleTodo(todo.id)}
                     onDelete={() => deleteTodo(todo.id)}
                     onDragStart={() => handleDragStart(todo.id)}
-                    onDragEnd={handleDragEnd}
+                    onDragEnd={(info) => handleDragEnd(todo.id, info)}
                     onDateChange={(d) => updateDueDate(todo.id, d)}
                     isDone={true}
                   />
@@ -252,7 +268,7 @@ interface TodoCardProps {
   onToggle: () => void;
   onDelete: () => void;
   onDragStart: () => void;
-  onDragEnd: () => void;
+  onDragEnd: (info: PanInfo) => void;
   onDateChange: (date?: string) => void;
   isDone: boolean;
 }
@@ -267,10 +283,12 @@ function TodoCard({ todo, onToggle, onDelete, onDragStart, onDragEnd, onDateChan
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
-      draggable
+      drag
+      dragSnapToOrigin
+      whileDrag={{ zIndex: 50, scale: 1.05, opacity: 0.9 }}
       onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      className={`group flex flex-col gap-1.5 p-3 rounded-xl border bg-card shadow-sm cursor-grab active:cursor-grabbing active:opacity-50 active:scale-95 hover:shadow-md transition-all duration-200 select-none ${isDone ? "border-border/40 opacity-65" : "border-border hover:border-electric-blue/30"}`}
+      onDragEnd={(e, info) => onDragEnd(info)}
+      className={`group flex flex-col gap-1.5 p-3 rounded-xl border bg-card shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-200 select-none ${isDone ? "border-border/40 opacity-65" : "border-border hover:border-electric-blue/30"}`}
     >
       <div className="flex items-center gap-2">
         <GripVertical className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground/20 group-hover:text-muted-foreground/50" />

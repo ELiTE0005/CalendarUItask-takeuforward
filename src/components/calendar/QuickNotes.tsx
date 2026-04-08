@@ -164,10 +164,20 @@ export function QuickNotes({ selectedRange }: QuickNotesProps) {
         </div>
       </div>
 
-      {/* Active range label */}
-      <p className="text-[11px] font-semibold text-foreground/80 -mb-1">
-        {rangeLabel}
-      </p>
+      {/* Active range label and actions */}
+      <div className="flex items-center justify-between -mb-1">
+        <p className="text-[11px] font-semibold text-foreground/80">
+          {rangeLabel}
+        </p>
+        <button
+          onClick={(e) => handleDeleteNote(e, rangeKey)}
+          disabled={!text}
+          className="p-1 rounded-md text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 disabled:opacity-0 transition-all duration-200"
+          title="Clear current note"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
 
       {/* Textarea */}
       <textarea
