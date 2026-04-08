@@ -2,7 +2,7 @@
 
 A highly polished, interactive React/Next.js calendar widget designed around the aesthetics of a physical wall calendar. It features dynamic date-range selection, an integrated quick-notes system, real-time live weather theming, and an orbital clock.
 
-**Live Demo:** [https://takeuforwardcalendarui.vercel.app](https://takeuforwardcalendarui.vercel.app)
+**Live Demo:** [Check UI](https://takeuforwardcalendarui.vercel.app)
 
 ---
 
