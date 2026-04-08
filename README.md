@@ -58,7 +58,8 @@ A highly polished, interactive React/Next.js calendar widget designed around the
 > **Evaluator Note:** Please find the attached video demonstration as requested.
 
 [Desktop Version(recommended for video quality*)](https://youtu.be/q1Z_S0YsVnQ)
-[Mobile Version] (https://youtube.com/shorts/9sPUb2S-234)
+
+[Mobile Version](https://youtube.com/shorts/9sPUb2S-234)
 
 *Note: Mobile version video quality is not good as it is recorded from mobile device.
 
