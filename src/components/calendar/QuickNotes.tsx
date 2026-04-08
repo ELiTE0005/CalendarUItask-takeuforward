@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
-import { FileText, CalendarDays, RotateCcw } from "lucide-react";
+import { FileText, RotateCcw, Trash2 } from "lucide-react";
 import type { DateRange } from "@/hooks/useCalendar";
 
 const STORAGE_KEY = "wall-calendar-quick-notes";
@@ -86,14 +86,29 @@ export function QuickNotes({ selectedRange }: QuickNotesProps) {
     if (val > toDate) setToDate(val);
   };
 
-  // Apply the calendar's currently dragged selection
-  const applyCalendarRange = () => {
-    if (!selectedRange) return;
-    const f = format(selectedRange.start, "yyyy-MM-dd");
-    const t = format(selectedRange.end, "yyyy-MM-dd");
-    setFromDate(f);
-    setToDate(t);
-    toast(`Notes for ${makeLabel(f, t)}`, { duration: 1500 });
+  // Sync calendar selection automatically
+  useEffect(() => {
+    if (selectedRange) {
+      const f = format(selectedRange.start, "yyyy-MM-dd");
+      const t = format(selectedRange.end, "yyyy-MM-dd");
+      if (f !== fromDate || t !== toDate) {
+        setFromDate(f);
+        setToDate(t);
+      }
+    }
+  }, [selectedRange]);
+
+  // Delete a specific note
+  const handleDeleteNote = (e: React.MouseEvent, key: string) => {
+    e.stopPropagation(); // prevent the parent button's onClick
+    setAllNotes((prev) => {
+      const updated = prev.filter((n) => n.key !== key);
+      saveNotes(updated);
+      return updated;
+    });
+    if (key === rangeKey) {
+      setText("");
+    }
   };
 
   // Recent notes (other than the current range)
@@ -147,21 +162,6 @@ export function QuickNotes({ selectedRange }: QuickNotesProps) {
             />
           </div>
         </div>
-
-        {/* Use calendar selection button — shown when calendar has a selection */}
-        {selectedRange && (
-          <button
-            onClick={applyCalendarRange}
-            className="w-full flex items-center gap-1.5 text-[10px] font-medium
-              text-electric-blue/70 hover:text-electric-blue
-              bg-electric-blue/5 hover:bg-electric-blue/10
-              border border-electric-blue/15 hover:border-electric-blue/30
-              rounded-lg px-2.5 py-1.5 transition-all duration-150"
-          >
-            <CalendarDays className="w-3 h-3" />
-            Use calendar selection
-          </button>
-        )}
       </div>
 
       {/* Active range label */}
@@ -196,15 +196,27 @@ export function QuickNotes({ selectedRange }: QuickNotesProps) {
               <button
                 key={note.key}
                 onClick={() => { setFromDate(f); setToDate(t || f); }}
-                className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-muted/50
+                className="relative w-full text-left px-2.5 py-2 rounded-lg hover:bg-muted/50
                   transition-colors group border border-transparent hover:border-border/50"
               >
-                <p className="text-[10px] font-semibold text-electric-blue/80 group-hover:text-electric-blue">
-                  {note.label}
-                </p>
-                <p className="text-[9px] text-muted-foreground/50 group-hover:text-muted-foreground truncate mt-0.5">
-                  {note.text.slice(0, 55)}{note.text.length > 55 ? "…" : ""}
-                </p>
+                <div className="pr-6">
+                  <p className="text-[10px] font-semibold text-electric-blue/80 group-hover:text-electric-blue">
+                    {note.label}
+                  </p>
+                  <p className="text-[9px] text-muted-foreground/50 group-hover:text-muted-foreground truncate mt-0.5">
+                    {note.text.slice(0, 55)}{note.text.length > 55 ? "…" : ""}
+                  </p>
+                </div>
+                
+                <button
+                  onClick={(e) => handleDeleteNote(e, note.key)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md
+                    text-muted-foreground/40 hover:text-red-500 hover:bg-red-500/10
+                    opacity-0 group-hover:opacity-100 transition-all duration-200"
+                  title="Delete note"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
               </button>
             );
           })}

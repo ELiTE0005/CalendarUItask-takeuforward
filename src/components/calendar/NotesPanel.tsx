@@ -97,7 +97,7 @@ export function NotesPanel() {
 
           <p className="text-[10px] text-muted-foreground/55 pl-5">
             {pendingTodos.length === 0
-              ? "All caught up — nothing pending"
+              ? "All caught up - nothing pending"
               : overdueItems.length > 0
               ? `${overdueItems.length} overdue · ${todayItems.length} today`
               : todayItems.length > 0
